@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block meta %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script>
+    function loadContent() {
+        var item = $(".table > tbody").children().length();
+        for (var i = 2; i < item; i++) {
+            $(".table > tbody > tr:nth-child(" + i + ")").remove();
+        }
+    }
+    $.get("http://127.0.0.1:8000/wishlist/json/", function (data) {
+        for (var i = 0; i < data.length; i++) {
+            var newRow = document.createElement("tr")
+            var nama = document.createElement("td")
+            var harga = document.createElement("td")
+            var decs = document.createElement("td")
+
+            nama.append()
+            harga.append()
+            decs.append()
+
+            newRow.append(nama)
+            newRow.append(harga)
+            newRow.append(decs)
+
+            $(".table").append(newRow)
+        }
+    });
+
+    $(document).ready(function () { removeContent() })
+
+    $("#add_barangt").click(function () {
+        var nama_brg = $("#input_nama").val();
+        var harga_brg = $("#input_harga").val();
+        var deskrip = $("#input_deskrip").val();
+
+        $.post("http://127.0.0.1:8000/wishlist/ajax/submit", { nama_brg, harga_brg, deskrip },
+        function (data, status) {
+            console.log("Adding item succes!");
+            $("#input_nama").val("");
+            $("#input_harga").val("");
+            $("#input_deskrip").val("");
+        });
+    });
+</script>
+{% endblock meta %}
+
+{% block content %}
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1">Halo, {{ nama }}!</span>
+    <a href="{% url 'wishlist:logout' %}"><button class="btn btn-primary" type="button">Logout</button></a>
+  </div>
+</nav>
+
+<p></p>
+<h1 class="text-center">Wishlist</h1>
+<p></p>
+<h6 class="text-center">Nama: {{ nama }} </h6>
+<p></p>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr class="table-primary">
+            <th scope="col">Nama Barang</th>
+            <th scope="col">Harga Barang</th>
+            <th scope="col">Deskripsi</th>
+        </tr>
+    </thead>
+</table>
+    {% comment %} Tambahkan data di bawah baris ini {% endcomment %}
+    <form method="POST" action="">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td>Tambah barang: </td>
+                <td><label for="input_nama"></label><input type="text" id="input_nama" name="nama_barang" placeholder="Nama" class="form-control"></td>
+            </tr>
+
+            <tr>
+                <td>Harga barang: </td>
+                <td><label for="input_barang"></label><input type="text" id="input_barang" name="harga_barang" placeholder="Harga" class="form-control"></td>
+            </tr>
+
+            <tr>
+                <td>Deskripsi barang: </td>
+                <td><label for="deskripsi"></label><input type="text" id="input_deskripsi" name="deskripsi_barang" placeholder="deskripsi" class="form-control"></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td><input  id="add_barang" class="btn btn-primary" type="submit" value="Tambah"></td>
+            </tr>
+        </table>
+    </form>
+
+<div class="text-center">
+<p></p>
+<h6>Sesi terakhir login: {{ last_login }}</h6>
+<p></p>
+
+<a href="{% url 'wishlist:logout' %}"><button class="btn btn-primary">Logout</button></a>
+</div>
+{% endblock content %}

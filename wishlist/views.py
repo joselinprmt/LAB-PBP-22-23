@@ -10,6 +10,8 @@ from django.contrib import messages
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
+
 from wishlist.models import BarangWishlist
 
 
@@ -22,6 +24,30 @@ def show_wishlist(request):
         'last_login': request.COOKIES['last_login'],
     }
     return render(request, "wishlist.html", context)
+
+
+@login_required(login_url='/wishlist/login/')
+def show_ajax(request):
+    data_barang_wishlist = BarangWishlist.objects.all()
+    context = {
+        'list_barang': data_barang_wishlist,
+        'nama': 'Joselin Permata Aprillia',
+        'last_login': request.COOKIES['last_login'],
+    }
+    return render(request, "wishlist_ajax.html", context)
+
+
+@login_required(login_url='/wishlist/login/')
+@csrf_exempt
+def add_barang(request):
+    if request.method == 'POST':
+        nama_barang = request.POST.get("nama")
+        harga_barang = request.POST.get("harga")
+        deskripsi = request.POST.get("deskripsi")
+        BarangWishlist.objects.create(nama_barang, harga_barang, deskripsi)
+        return HttpResponse()
+    else:
+        return redirect(show_wishlist)
 
 
 def show_xml(request):
